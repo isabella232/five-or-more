@@ -143,7 +143,7 @@ private class View : DrawingArea
         if (!show_cursor)
         {
             show_cursor = true;
-         // queue_draw_area (keyboard_cursor_x * piece_size, keyboard_cursor_y * piece_size, piece_size, piece_size);
+            queue_draw_area (keyboard_cursor_x * piece_size, keyboard_cursor_y * piece_size, piece_size, piece_size);
         }
 
         keyboard_cursor_x += x;
@@ -161,9 +161,8 @@ private class View : DrawingArea
         if (keyboard_cursor_x == prev_x && keyboard_cursor_y == prev_y)
             return;
 
-     // queue_draw_area (prev_x * piece_size, prev_y * piece_size, piece_size, piece_size);
-     // queue_draw_area (keyboard_cursor_x * piece_size, keyboard_cursor_y * piece_size, piece_size, piece_size);
-        queue_draw ();
+        queue_draw_area (prev_x * piece_size, prev_y * piece_size, piece_size, piece_size);
+        queue_draw_area (keyboard_cursor_x * piece_size, keyboard_cursor_y * piece_size, piece_size, piece_size);
     }
 
     private void init_keyboard ()
@@ -307,8 +306,7 @@ private class View : DrawingArea
         if (show_cursor)
         {
             show_cursor = false;
-         // queue_draw_area (keyboard_cursor_x * piece_size, keyboard_cursor_y * piece_size, piece_size, piece_size);
-            queue_draw ();
+            queue_draw_area (keyboard_cursor_x * piece_size, keyboard_cursor_y * piece_size, piece_size, piece_size);
         }
 
         cell_x = (int)event_x / piece_size;
