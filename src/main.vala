@@ -78,7 +78,14 @@ private class FiveOrMoreApp: Gtk.Application
 
     private void help_cb ()
     {
-        Gtk.show_uri (window, "help:five-or-more", Gdk.CURRENT_TIME);
+        try
+        {
+            Gtk.show_uri_on_window (window, "help:five-or-more", Gtk.get_current_event_time ());
+        }
+        catch (GLib.Error e)
+        {
+            GLib.warning ("Unable to open help: %s", e.message);
+        }
     }
 
     private void about_cb ()
