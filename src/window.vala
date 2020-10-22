@@ -36,8 +36,8 @@ private class GameWindow : ApplicationWindow
     private AspectFrame grid_frame;
 
     private GLib.Settings settings = new GLib.Settings ("org.gnome.five-or-more");
-    private bool window_is_tiled;
-    private bool window_is_maximized;
+    private bool window_tiled;
+    private bool window_maximized;
     private int window_width;
     private int window_height;
 
@@ -75,7 +75,6 @@ private class GameWindow : ApplicationWindow
         add_action_entries (win_actions, this);
 
         map.connect (init_state_watcher);
-        unmap.connect (on_unmap);
 
         SimpleAction theme_action = (SimpleAction) lookup_action ("change-theme");
         string theme_value = settings.get_string (FiveOrMoreApp.KEY_THEME);
@@ -102,12 +101,9 @@ private class GameWindow : ApplicationWindow
         game = new Game (board_size);
         theme = new ThemeRenderer (settings);
 
-        window_width = settings.get_int ("window-width");
-        window_height = settings.get_int ("window-height");
-        window_is_maximized = settings.get_boolean ("window-is-maximized");
-        if (window_is_maximized)
+        set_default_size (settings.get_int ("window-width"), settings.get_int ("window-height"));
+        if (settings.get_boolean ("window-is-maximized"))
             maximize ();
-        set_default_size (window_width, window_height);
 
         NextPiecesWidget next_pieces_widget = new NextPiecesWidget (settings, game, theme);
         preview_hbox.prepend (next_pieces_widget);
@@ -145,26 +141,25 @@ private class GameWindow : ApplicationWindow
     {
         Gdk.ToplevelState state = surface.get_state ();
 
-        window_is_maximized =   (state & Gdk.ToplevelState.MAXIMIZED)   != 0;
-        window_is_tiled =       (state & tiled_state)                   != 0;
+        window_maximized =  (state & Gdk.ToplevelState.MAXIMIZED) != 0;
+        window_tiled =      (state & tiled_state)                 != 0;
     }
 
     private inline void on_size_changed (int width, int height)
     {
-        if (window_is_maximized || window_is_tiled)
+        if (window_maximized || window_tiled)
             return;
-        get_size (out window_width, out window_height);
+        window_width  = width;
+        window_height = height;
     }
 
-    private inline void on_unmap ()
+    internal inline void on_shutdown ()
     {
         settings.delay ();
         settings.set_int ("window-width", window_width);
         settings.set_int ("window-height", window_height);
-        settings.set_boolean ("window-is-maximized", window_is_maximized);
+        settings.set_boolean ("window-is-maximized", window_maximized);
         settings.apply ();
-
-        application.quit ();
     }
 
     private void set_status_message (string? message)
